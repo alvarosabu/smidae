@@ -48,11 +48,18 @@ const log = {
 
 function isDuplicateError(err: unknown): boolean {
   if (isDirectusError(err)) {
-    const errs = (err as { errors?: Array<{ extensions?: { code?: string } }> }).errors ?? []
+    const errs = (err as {
+      errors?: Array<{ message?: string, extensions?: { code?: string } }>
+    }).errors ?? []
     const code = errs[0]?.extensions?.code
-    return code === 'RECORD_NOT_UNIQUE' || code === 'INVALID_PAYLOAD'
+    if (code === 'RECORD_NOT_UNIQUE') return true
+    const message = errs[0]?.message ?? ''
+    if (/already exists|duplicate/i.test(message)) return true
+    return false
   }
-  // Fallback: status 400 from Directus typically means already exists in schema ops.
+  // Fallback: SQL-layer dupes that don't get normalized through Directus errors.
+  const message = (err as { message?: string })?.message ?? ''
+  if (/already exists|duplicate/i.test(message)) return true
   return false
 }
 
@@ -299,12 +306,14 @@ async function ensureM2M(opts: {
     field: thisCol,
     type: 'uuid',
     nullable: true,
+    special: ['m2o'],
     foreign: { table: collection, column: 'id' },
   })
   await ensureField(junction, {
     field: relCol,
     type: 'uuid',
     nullable: true,
+    special: ['m2o'],
     foreign: { table: relatedCollection, column: 'id' },
   })
 
@@ -435,6 +444,7 @@ async function bootstrapComponents(): Promise<void> {
     nullable: true,
     interface: 'select-dropdown-m2o',
     options: { template: '{{name}}' },
+    special: ['m2o'],
     foreign: { table: 'categories', column: 'id' },
   })
   await ensureRelation({
