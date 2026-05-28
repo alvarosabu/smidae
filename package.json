@@ -8,7 +8,11 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
-    "typecheck": "nuxt typecheck"
+    "typecheck": "nuxt typecheck",
+    "directus:bootstrap": "directus bootstrap",
+    "directus:start": "directus start",
+    "directus:schema:snapshot": "directus schema snapshot --yes ./directus/snapshot.yaml",
+    "directus:schema:apply": "directus schema apply --yes ./directus/snapshot.yaml"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.108",
@@ -21,6 +25,7 @@
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.15.2",
+    "directus": "^11.17.4",
     "eslint": "^10.4.0",
     "typescript": "^6.0.3",
     "vue-tsc": "^3.3.0"

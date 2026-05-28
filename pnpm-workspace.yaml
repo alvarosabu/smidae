@@ -1,7 +1,17 @@
 allowBuilds:
   '@parcel/watcher': false
   '@tailwindcss/oxide': false
+  argon2: true
   esbuild: false
-  sharp: set this to true or false
+  isolated-vm: true
+  oracledb: false
+  protobufjs: false
+  sharp: true
+  sqlite3: true
   unrs-resolver: false
   vue-demi: false
+onlyBuiltDependencies:
+  - sqlite3
+  - argon2
+  - sharp
+  - isolated-vm
