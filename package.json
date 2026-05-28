@@ -11,6 +11,7 @@
     "typecheck": "nuxt typecheck",
     "directus:bootstrap": "directus bootstrap",
     "directus:start": "directus start",
+    "directus:schema:bootstrap": "tsx scripts/directus-schema.ts",
     "directus:schema:snapshot": "directus schema snapshot --yes ./directus/snapshot.yaml",
     "directus:schema:apply": "directus schema apply --yes ./directus/snapshot.yaml"
   },
@@ -24,9 +25,12 @@
     "tailwindcss": "^4.3.0"
   },
   "devDependencies": {
+    "@directus/sdk": "^21.3.0",
     "@nuxt/eslint": "^1.15.2",
     "directus": "^11.17.4",
+    "dotenv": "^17.4.2",
     "eslint": "^10.4.0",
+    "tsx": "^4.22.3",
     "typescript": "^6.0.3",
     "vue-tsc": "^3.3.0"
   },
