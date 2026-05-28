@@ -15,7 +15,8 @@
     "directus:start": "directus start",
     "directus:schema:bootstrap": "tsx scripts/directus-schema.ts",
     "directus:schema:snapshot": "directus schema snapshot --yes ./directus/snapshot.yaml",
-    "directus:schema:apply": "directus schema apply --yes ./directus/snapshot.yaml"
+    "directus:schema:apply": "directus schema apply --yes ./directus/snapshot.yaml",
+    "seed": "tsx scripts/directus-seed.ts"
   },
   "dependencies": {
     "@directus/sdk": "^21.3.0",
