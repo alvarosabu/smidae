@@ -9,6 +9,8 @@
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "typecheck": "nuxt typecheck",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "directus:bootstrap": "directus bootstrap",
     "directus:start": "directus start",
     "directus:schema:bootstrap": "tsx scripts/directus-schema.ts",
@@ -16,22 +18,25 @@
     "directus:schema:apply": "directus schema apply --yes ./directus/snapshot.yaml"
   },
   "dependencies": {
+    "@directus/sdk": "^21.3.0",
     "@iconify-json/lucide": "^1.2.108",
     "@iconify-json/simple-icons": "^1.2.83",
     "@nuxt/image": "2.0.0",
     "@nuxt/ui": "^4.7.1",
     "@vueuse/nuxt": "14.3.0",
+    "marked": "^18.0.4",
     "nuxt": "^4.4.6",
     "tailwindcss": "^4.3.0"
   },
   "devDependencies": {
-    "@directus/sdk": "^21.3.0",
     "@nuxt/eslint": "^1.15.2",
+    "@nuxt/test-utils": "^4.0.3",
     "directus": "^11.17.4",
     "dotenv": "^17.4.2",
     "eslint": "^10.4.0",
     "tsx": "^4.22.3",
     "typescript": "^6.0.3",
+    "vitest": "^4.1.7",
     "vue-tsc": "^3.3.0"
   },
   "packageManager": "pnpm@11.1.3"

@@ -17,6 +17,14 @@ export default defineNuxtConfig({
     '/': { prerender: true }
   },
 
+  runtimeConfig: {
+    directusToken: '',
+    public: {
+      directusUrl: 'http://localhost:8055',
+      directusToken: ''
+    }
+  },
+
   compatibilityDate: '2025-01-15',
 
   eslint: {
