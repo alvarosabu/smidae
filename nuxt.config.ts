@@ -13,16 +13,16 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
-  routeRules: {
-    '/': { prerender: true }
-  },
-
   runtimeConfig: {
     directusToken: '',
     public: {
       directusUrl: 'http://localhost:8055',
       directusToken: ''
     }
+  },
+
+  routeRules: {
+    '/': { prerender: true }
   },
 
   compatibilityDate: '2025-01-15',

@@ -22,7 +22,7 @@ import {
   readPolicies,
   readRelations,
   rest,
-  staticToken,
+  staticToken
 } from '@directus/sdk'
 
 // ---------------------------------------------------------------------------
@@ -43,7 +43,7 @@ const log = {
   step: (msg: string) => console.log(`\n› ${msg}`),
   ok: (msg: string) => console.log(`  ✓ ${msg}`),
   skip: (msg: string) => console.log(`  • skip ${msg}`),
-  warn: (msg: string) => console.warn(`  ! ${msg}`),
+  warn: (msg: string) => console.warn(`  ! ${msg}`)
 }
 
 function isDuplicateError(err: unknown): boolean {
@@ -85,8 +85,7 @@ async function loadExistingFields(collection: string): Promise<Set<string>> {
     try {
       const fields = await client.request(readFields(collection))
       set = new Set(fields.map(f => f.field))
-    }
-    catch {
+    } catch {
       set = new Set()
     }
     existingFieldsByCollection.set(collection, set)
@@ -117,7 +116,7 @@ async function ensureCollection(
     archiveField?: string | null
     archiveValue?: string | null
     unarchiveValue?: string | null
-  } = {},
+  } = {}
 ): Promise<void> {
   const existing = await loadExistingCollections()
   if (existing.has(collection)) {
@@ -136,11 +135,11 @@ async function ensureCollection(
         sort_field: opts.sortField ?? null,
         archive_field: opts.archiveField ?? null,
         archive_value: opts.archiveValue ?? null,
-        unarchive_value: opts.unarchiveValue ?? null,
+        unarchive_value: opts.unarchiveValue ?? null
       },
       schema: {
         name: collection,
-        comment: null,
+        comment: null
       },
       // Primary key: a UUID `id` field auto-populated by Directus.
       fields: [
@@ -151,16 +150,16 @@ async function ensureCollection(
             hidden: true,
             readonly: true,
             interface: 'input',
-            special: ['uuid'],
+            special: ['uuid']
           },
           schema: {
             is_primary_key: true,
             has_auto_increment: false,
-            is_nullable: false,
-          },
-        } as never,
-      ],
-    }),
+            is_nullable: false
+          }
+        } as never
+      ]
+    })
   )
   existing.add(collection)
   existingFieldsByCollection.set(collection, new Set(['id']))
@@ -198,7 +197,7 @@ async function ensureField(collection: string, def: FieldDef): Promise<void> {
   const schema: Record<string, unknown> = {
     is_nullable: def.nullable ?? !def.required,
     default_value: def.defaultValue ?? null,
-    is_unique: def.unique ?? false,
+    is_unique: def.unique ?? false
   }
   if (def.maxLength !== undefined) schema.max_length = def.maxLength
   if (def.foreign) {
@@ -218,15 +217,14 @@ async function ensureField(collection: string, def: FieldDef): Promise<void> {
           display: def.display ?? null,
           display_options: def.displayOptions ?? null,
           required: def.required ?? false,
-          note: def.note ?? null,
+          note: def.note ?? null
         },
-        schema: schema as never,
-      }),
+        schema: schema as never
+      })
     )
     fields.add(def.field)
     log.ok(`field ${collection}.${def.field}`)
-  }
-  catch (err) {
+  } catch (err) {
     if (isDuplicateError(err)) {
       fields.add(def.field)
       log.skip(`${collection}.${def.field} (existed)`)
@@ -257,14 +255,13 @@ async function ensureRelation(item: {
         related_collection: item.related_collection,
         meta: (item.meta ?? {}) as never,
         schema: (item.schema ?? {
-          on_delete: 'SET NULL',
-        }) as never,
-      }),
+          on_delete: 'SET NULL'
+        }) as never
+      })
     )
     rels.push({ collection: item.collection, field: item.field })
     log.ok(`relation ${item.collection}.${item.field} → ${item.related_collection}`)
-  }
-  catch (err) {
+  } catch (err) {
     if (isDuplicateError(err)) {
       rels.push({ collection: item.collection, field: item.field })
       log.skip(`relation ${item.collection}.${item.field} (existed)`)
@@ -291,7 +288,7 @@ async function ensureM2M(opts: {
     collection,
     field,
     relatedCollection,
-    junction,
+    junction
   } = opts
   const thisCol = opts.junctionThisColumn ?? `${collection}_id`
   const relCol = opts.junctionRelatedColumn ?? `${relatedCollection}_id`
@@ -307,14 +304,14 @@ async function ensureM2M(opts: {
     type: 'uuid',
     nullable: true,
     special: ['m2o'],
-    foreign: { table: collection, column: 'id' },
+    foreign: { table: collection, column: 'id' }
   })
   await ensureField(junction, {
     field: relCol,
     type: 'uuid',
     nullable: true,
     special: ['m2o'],
-    foreign: { table: relatedCollection, column: 'id' },
+    foreign: { table: relatedCollection, column: 'id' }
   })
 
   // 3. Relations: each FK column on the junction → its target.
@@ -325,9 +322,9 @@ async function ensureM2M(opts: {
     meta: {
       one_field: field, // alias on parent
       junction_field: relCol,
-      sort_field: null,
+      sort_field: null
     },
-    schema: { on_delete: 'CASCADE' },
+    schema: { on_delete: 'CASCADE' }
   })
   await ensureRelation({
     collection: junction,
@@ -336,9 +333,9 @@ async function ensureM2M(opts: {
     meta: {
       one_field: null,
       junction_field: thisCol,
-      sort_field: null,
+      sort_field: null
     },
-    schema: { on_delete: 'CASCADE' },
+    schema: { on_delete: 'CASCADE' }
   })
 
   // 4. Alias field on parent so the M2M shows up in queries / admin UI.
@@ -347,7 +344,7 @@ async function ensureM2M(opts: {
     type: 'alias',
     special: ['m2m'],
     interface: 'list-m2m',
-    options: { template: '{{name}}' },
+    options: { template: '{{name}}' }
   })
 }
 
@@ -366,8 +363,8 @@ async function ensureStatusField(collection: string): Promise<void> {
       choices: [
         { text: 'Draft', value: 'draft' },
         { text: 'Published', value: 'published' },
-        { text: 'Archived', value: 'archived' },
-      ],
+        { text: 'Archived', value: 'archived' }
+      ]
     },
     display: 'labels',
     displayOptions: {
@@ -375,10 +372,10 @@ async function ensureStatusField(collection: string): Promise<void> {
       choices: [
         { text: 'Draft', value: 'draft', foreground: '#FFFFFF', background: '#D3DAE4' },
         { text: 'Published', value: 'published', foreground: '#FFFFFF', background: '#2ECDA7' },
-        { text: 'Archived', value: 'archived', foreground: '#FFFFFF', background: '#A2B5CD' },
-      ],
+        { text: 'Archived', value: 'archived', foreground: '#FFFFFF', background: '#A2B5CD' }
+      ]
     },
-    nullable: false,
+    nullable: false
   })
 }
 
@@ -390,7 +387,7 @@ async function ensureTimestamps(collection: string): Promise<void> {
     interface: 'datetime',
     display: 'datetime',
     displayOptions: { relative: true },
-    special: ['date-created'],
+    special: ['date-created']
   })
   await ensureField(collection, {
     field: 'date_updated',
@@ -399,7 +396,7 @@ async function ensureTimestamps(collection: string): Promise<void> {
     interface: 'datetime',
     display: 'datetime',
     displayOptions: { relative: true },
-    special: ['date-updated'],
+    special: ['date-updated']
   })
 }
 
@@ -428,7 +425,7 @@ async function bootstrapComponents(): Promise<void> {
     icon: 'memory',
     archiveField: 'status',
     archiveValue: 'archived',
-    unarchiveValue: 'draft',
+    unarchiveValue: 'draft'
   })
 
   await ensureStatusField('components')
@@ -445,13 +442,13 @@ async function bootstrapComponents(): Promise<void> {
     interface: 'select-dropdown-m2o',
     options: { template: '{{name}}' },
     special: ['m2o'],
-    foreign: { table: 'categories', column: 'id' },
+    foreign: { table: 'categories', column: 'id' }
   })
   await ensureRelation({
     collection: 'components',
     field: 'category',
     related_collection: 'categories',
-    schema: { on_delete: 'SET NULL' },
+    schema: { on_delete: 'SET NULL' }
   })
 
   await ensureField('components', { field: 'manufacturer', type: 'string', nullable: true, interface: 'input' })
@@ -462,14 +459,14 @@ async function bootstrapComponents(): Promise<void> {
     required: true,
     defaultValue: 0,
     interface: 'input',
-    nullable: false,
+    nullable: false
   })
   await ensureField('components', { field: 'location', type: 'string', nullable: true, interface: 'input' })
   await ensureField('components', {
     field: 'overview',
     type: 'text',
     nullable: true,
-    interface: 'input-rich-text-md',
+    interface: 'input-rich-text-md'
   })
   await ensureField('components', {
     field: 'features',
@@ -481,9 +478,9 @@ async function bootstrapComponents(): Promise<void> {
       fields: [
         { field: 'title', name: 'Title', type: 'string', meta: { interface: 'input', width: 'full' } },
         { field: 'description', name: 'Description', type: 'text', meta: { interface: 'input-multiline', width: 'full' } },
-        { field: 'icon', name: 'Icon', type: 'string', meta: { interface: 'select-icon', width: 'half' } },
-      ],
-    },
+        { field: 'icon', name: 'Icon', type: 'string', meta: { interface: 'select-icon', width: 'half' } }
+      ]
+    }
   })
   await ensureField('components', {
     field: 'specs',
@@ -494,9 +491,9 @@ async function bootstrapComponents(): Promise<void> {
       template: '{{ label }}: {{ value }}',
       fields: [
         { field: 'label', name: 'Label', type: 'string', meta: { interface: 'input', width: 'half' } },
-        { field: 'value', name: 'Value', type: 'string', meta: { interface: 'input', width: 'half' } },
-      ],
-    },
+        { field: 'value', name: 'Value', type: 'string', meta: { interface: 'input', width: 'half' } }
+      ]
+    }
   })
 
   // M2M gallery → directus_files (distinct junction).
@@ -504,7 +501,7 @@ async function bootstrapComponents(): Promise<void> {
     collection: 'components',
     field: 'gallery',
     relatedCollection: 'directus_files',
-    junction: 'components_files',
+    junction: 'components_files'
   })
 
   // M2M datasheets → directus_files (distinct junction).
@@ -512,7 +509,7 @@ async function bootstrapComponents(): Promise<void> {
     collection: 'components',
     field: 'datasheets',
     relatedCollection: 'directus_files',
-    junction: 'components_datasheets',
+    junction: 'components_datasheets'
   })
 
   // M2M tags → tags.
@@ -520,7 +517,7 @@ async function bootstrapComponents(): Promise<void> {
     collection: 'components',
     field: 'tags',
     relatedCollection: 'tags',
-    junction: 'components_tags',
+    junction: 'components_tags'
   })
 }
 
@@ -530,7 +527,7 @@ async function bootstrapTutorials(): Promise<void> {
     icon: 'school',
     archiveField: 'status',
     archiveValue: 'archived',
-    unarchiveValue: 'draft',
+    unarchiveValue: 'draft'
   })
 
   await ensureStatusField('tutorials')
@@ -541,7 +538,7 @@ async function bootstrapTutorials(): Promise<void> {
     type: 'timestamp',
     nullable: true,
     interface: 'datetime',
-    display: 'datetime',
+    display: 'datetime'
   })
   await ensureField('tutorials', { field: 'title', type: 'string', required: true, interface: 'input' })
   await ensureField('tutorials', { field: 'slug', type: 'string', required: true, unique: true, interface: 'input' })
@@ -554,20 +551,20 @@ async function bootstrapTutorials(): Promise<void> {
     nullable: true,
     interface: 'file-image',
     foreign: { table: 'directus_files', column: 'id' },
-    special: ['file'],
+    special: ['file']
   })
   await ensureRelation({
     collection: 'tutorials',
     field: 'cover',
     related_collection: 'directus_files',
-    schema: { on_delete: 'SET NULL' },
+    schema: { on_delete: 'SET NULL' }
   })
 
   await ensureField('tutorials', {
     field: 'content',
     type: 'text',
     nullable: true,
-    interface: 'input-rich-text-md',
+    interface: 'input-rich-text-md'
   })
 
   // M2M tutorials.components → components
@@ -575,7 +572,7 @@ async function bootstrapTutorials(): Promise<void> {
     collection: 'tutorials',
     field: 'components',
     relatedCollection: 'components',
-    junction: 'tutorials_components',
+    junction: 'tutorials_components'
   })
 }
 
@@ -607,8 +604,8 @@ async function ensurePermissions(policyId: string, specs: PermSpec[]): Promise<v
     readPermissions({
       filter: { policy: { _eq: policyId } } as never,
       fields: ['id', 'collection', 'action'],
-      limit: -1,
-    }),
+      limit: -1
+    })
   )
   const existingKeys = new Set(existing.map(p => `${p.collection}::${p.action}`))
 
@@ -627,12 +624,11 @@ async function ensurePermissions(policyId: string, specs: PermSpec[]): Promise<v
           fields: spec.fields ?? ['*'],
           permissions: (spec.permissions ?? {}) as never,
           validation: {} as never,
-          presets: null as never,
-        }),
+          presets: null as never
+        })
       )
       log.ok(`${spec.action} ${spec.collection}`)
-    }
-    catch (err) {
+    } catch (err) {
       if (isDuplicateError(err)) {
         log.skip(`${spec.action} ${spec.collection} (existed)`)
         continue
@@ -655,7 +651,7 @@ async function bootstrapPermissions(): Promise<void> {
     { collection: 'components_files', action: 'read' },
     { collection: 'components_datasheets', action: 'read' },
     { collection: 'components_tags', action: 'read' },
-    { collection: 'tutorials_components', action: 'read' },
+    { collection: 'tutorials_components', action: 'read' }
   ])
 }
 
@@ -680,8 +676,7 @@ main().catch((err) => {
   if (isDirectusError(err)) {
     const e = err as { errors?: unknown }
     console.error(JSON.stringify(e.errors ?? err, null, 2))
-  }
-  else {
+  } else {
     console.error(err)
   }
   process.exit(1)

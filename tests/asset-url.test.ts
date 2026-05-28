@@ -17,11 +17,11 @@ describe('buildAssetUrl', () => {
   })
 
   it('accepts a file object with an id field', () => {
-    expect(buildAssetUrl(BASE, { id: 'abc-123' } as any)).toBe('http://localhost:8055/assets/abc-123')
+    expect(buildAssetUrl(BASE, { id: 'abc-123' })).toBe('http://localhost:8055/assets/abc-123')
   })
 
   it('returns null when file object has no id', () => {
-    expect(buildAssetUrl(BASE, { id: '' } as any)).toBeNull()
+    expect(buildAssetUrl(BASE, { id: '' })).toBeNull()
   })
 
   it('applies width, height, fit, quality transforms', () => {

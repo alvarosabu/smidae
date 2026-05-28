@@ -12,7 +12,7 @@ export interface AssetTransform {
 export function buildAssetUrl(
   baseUrl: string,
   file: string | DirectusFile | { id: string } | null | undefined,
-  transform?: AssetTransform,
+  transform?: AssetTransform
 ): string | null {
   if (!file) return null
   const id = typeof file === 'string' ? file : file.id
