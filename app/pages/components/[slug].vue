@@ -1,0 +1,127 @@
+<script setup lang="ts">
+import { readItems } from '@directus/sdk'
+import type { Component } from '~/types/directus'
+
+const route = useRoute()
+const slug = route.params.slug as string
+const client = useDirectus()
+
+const { data: component } = await useAsyncData<Component | null>(`component-${slug}`, async () => {
+  const items = await client.request(readItems('components', {
+    filter: { slug: { _eq: slug }, status: { _eq: 'published' } } as never,
+    limit: 1,
+    fields: [
+      'id', 'slug', 'name', 'manufacturer', 'part_number', 'quantity', 'location',
+      'overview', 'features', 'specs', 'date_created', 'date_updated', 'status',
+      { category: ['id', 'name', 'slug'] },
+      { gallery: [{ directus_files_id: ['id', 'filename_download', 'type'] }] },
+      { datasheets: [{ directus_files_id: ['id', 'filename_download', 'type'] }] },
+      { tags: [{ tags_id: ['id', 'name'] }] }
+    ] as never
+  }))
+  return ((items as unknown as Component[])[0]) ?? null
+})
+
+if (!component.value) throw createError({ statusCode: 404, statusMessage: 'Component not found' })
+
+const tagNames = computed(() => (component.value?.tags ?? [])
+  .map(t => typeof t.tags_id === 'string' ? null : t.tags_id?.name)
+  .filter((n): n is string => !!n))
+
+const categoryName = computed(() => {
+  const c = component.value?.category
+  return c && typeof c !== 'string' ? c.name : null
+})
+
+useSeoMeta({
+  title: () => `${component.value?.name} — Smidae`,
+  description: () => component.value?.overview?.slice(0, 160) ?? null
+})
+</script>
+
+<template>
+  <UContainer
+    v-if="component"
+    class="py-8 max-w-6xl space-y-8"
+  >
+    <nav class="text-sm flex items-center gap-2 text-muted">
+      <NuxtLink
+        to="/"
+        class="hover:underline"
+      >
+        Catalog
+      </NuxtLink>
+      <span>/</span>
+      <span v-if="categoryName">{{ categoryName }}</span>
+      <span v-if="categoryName">/</span>
+      <span class="text-foreground">{{ component.name }}</span>
+    </nav>
+
+    <div class="grid lg:grid-cols-2 gap-8">
+      <CatalogGallery :items="component.gallery ?? []" />
+      <div class="space-y-4">
+        <div>
+          <h1 class="text-3xl font-bold">
+            {{ component.name }}
+          </h1>
+          <p class="text-muted">
+            <span v-if="component.manufacturer">{{ component.manufacturer }}</span>
+            <span v-if="component.part_number"> · {{ component.part_number }}</span>
+          </p>
+        </div>
+        <div class="flex gap-2 flex-wrap">
+          <UBadge
+            color="primary"
+            variant="soft"
+          >
+            Qty {{ component.quantity }}
+          </UBadge>
+          <UBadge
+            v-if="component.location"
+            color="neutral"
+            variant="soft"
+          >
+            {{ component.location }}
+          </UBadge>
+          <UBadge
+            v-for="t in tagNames"
+            :key="t"
+            color="primary"
+            variant="subtle"
+          >
+            {{ t }}
+          </UBadge>
+        </div>
+        <CatalogDatasheetList :items="component.datasheets ?? []" />
+      </div>
+    </div>
+
+    <section v-if="component.overview">
+      <h2 class="text-xl font-semibold mb-3">
+        Overview
+      </h2>
+      <MarkdownBlock :source="component.overview" />
+    </section>
+
+    <section v-if="component.features?.length">
+      <h2 class="text-xl font-semibold mb-3">
+        Features
+      </h2>
+      <CatalogFeaturesList :items="component.features" />
+    </section>
+
+    <section v-if="component.specs?.length">
+      <h2 class="text-xl font-semibold mb-3">
+        Specifications
+      </h2>
+      <CatalogSpecsTable :items="component.specs" />
+    </section>
+
+    <section>
+      <h2 class="text-xl font-semibold mb-3">
+        Tutorials
+      </h2>
+      <CatalogRelatedTutorials :component-id="component.id" />
+    </section>
+  </UContainer>
+</template>
