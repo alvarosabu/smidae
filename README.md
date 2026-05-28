@@ -26,7 +26,7 @@ node -e "console.log('KEY=' + require('crypto').randomUUID()); console.log('SECR
 pnpm install
 pnpm directus:bootstrap          # one-time: creates SQLite DB + admin user
 pnpm directus:start &            # backend on http://localhost:8055
-pnpm directus:schema:bootstrap   # programmatic schema setup (or pnpm directus:schema:apply if snapshot is fresh)
+pnpm directus:schema:apply       # apply committed snapshot
 pnpm seed                        # one-time sample data
 pnpm dev                         # frontend on http://localhost:3000
 ```
@@ -43,9 +43,9 @@ Directus admin: http://localhost:8055/admin (log in with `ADMIN_EMAIL` / `ADMIN_
 - `pnpm seed` — populate sample data (idempotent)
 - `pnpm directus:start` — start Directus locally
 - `pnpm directus:bootstrap` — initialize Directus DB + admin user
-- `pnpm directus:schema:bootstrap` — apply schema via SDK script
-- `pnpm directus:schema:snapshot` — capture current schema to `directus/snapshot.yaml`
 - `pnpm directus:schema:apply` — apply committed snapshot to a fresh Directus
+- `pnpm directus:schema:snapshot` — capture current schema to `directus/snapshot.yaml`
+- `pnpm directus:schema:bootstrap` — alternative: re-create schema from the SDK script
 
 ## Production (Docker)
 See `docs/deployment.md`.

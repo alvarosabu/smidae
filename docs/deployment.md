@@ -31,6 +31,8 @@ On a fresh deployment you'll want to apply the committed schema:
 docker compose exec directus npx directus schema apply --yes /directus/snapshot.yaml
 ```
 
+Note: the snapshot is bind-mounted read-only, so this only *applies* an existing snapshot. To capture a NEW snapshot from a running production stack, either bind-mount `directus/snapshot.yaml` writeable in `docker-compose.yml`, or run the host-side `pnpm directus:schema:snapshot` against the exposed port (with `PUBLIC_URL` and `ADMIN_TOKEN` set).
+
 Then seed sample data from outside the container:
 ```bash
 ADMIN_TOKEN=$(grep ADMIN_TOKEN .env | cut -d'=' -f2) PUBLIC_URL=http://localhost:8055 pnpm seed

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+const config = useRuntimeConfig()
+const adminUrl = computed(() => `${config.public.directusUrl}/admin`)
+
 useHead({
   htmlAttrs: { lang: 'en' },
   link: [{ rel: 'icon', href: '/favicon.ico' }]
@@ -28,7 +31,7 @@ useSeoMeta({
         />
         <UColorModeButton />
         <UButton
-          to="http://localhost:8055/admin"
+          :to="adminUrl"
           target="_blank"
           icon="i-lucide-database"
           variant="ghost"

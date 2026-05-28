@@ -15,14 +15,11 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     directusToken: '',
+    directusInternalUrl: '', // SSR-only; falls back to public URL when empty
     public: {
       directusUrl: 'http://localhost:8055',
       directusToken: ''
     }
-  },
-
-  routeRules: {
-    '/': { prerender: true }
   },
 
   compatibilityDate: '2025-01-15',

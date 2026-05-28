@@ -26,7 +26,10 @@ services:
     ports:
       - "3000:3000"
     environment:
-      NUXT_PUBLIC_DIRECTUS_URL: ${NUXT_PUBLIC_DIRECTUS_URL:-http://directus:8055}
+      # Browser-facing URL — must be reachable from the user's browser.
+      NUXT_PUBLIC_DIRECTUS_URL: ${NUXT_PUBLIC_DIRECTUS_URL:-http://localhost:8055}
+      # SSR-only URL — used inside the container network.
+      NUXT_DIRECTUS_INTERNAL_URL: http://directus:8055
       NUXT_DIRECTUS_TOKEN: ${ADMIN_TOKEN}
     depends_on:
       - directus
