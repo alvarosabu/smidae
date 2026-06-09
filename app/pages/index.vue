@@ -31,6 +31,7 @@ useSeoMeta({
     <CatalogFilters
       v-model:category="query.category"
       v-model:tags="query.tags"
+      v-model:availability="query.availability"
     />
     <div
       v-if="pending"

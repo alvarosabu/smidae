@@ -22,6 +22,9 @@ const { data: tutorial } = await useAsyncData<Tutorial | null>(`tutorial-${slug}
 
 if (!tutorial.value) throw createError({ statusCode: 404, statusMessage: 'Tutorial not found' })
 
+const { data: contentHtml } = await useAsyncData(`tutorial-html-${slug}`, () =>
+  $fetch('/api/markdown', { method: 'POST', body: { source: tutorial.value?.content } }).then(r => r.html))
+
 const coverId = computed(() => {
   const c = tutorial.value?.cover
   return typeof c === 'string' ? c : c?.id ?? null
@@ -68,7 +71,7 @@ useSeoMeta({
       :src="coverUrl"
       class="w-full rounded"
     >
-    <MarkdownBlock :source="tutorial.content" />
+    <MarkdownBlock :html="contentHtml" />
     <section
       v-if="relatedComponents.length"
       class="pt-6 border-t"

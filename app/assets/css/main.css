@@ -1,18 +1,32 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
+@plugin "@tailwindcss/typography";
 
 @theme static {
   --font-sans: 'Public Sans', sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
 
-  --color-green-50: #EFFDF5;
-  --color-green-100: #D9FBE8;
-  --color-green-200: #B3F5D1;
-  --color-green-300: #75EDAE;
-  --color-green-400: #00DC82;
-  --color-green-500: #00C16A;
-  --color-green-600: #00A155;
-  --color-green-700: #007F45;
-  --color-green-800: #016538;
-  --color-green-900: #0A5331;
-  --color-green-950: #052E16;
+  --color-brand-50: #FFF5F4;
+  --color-brand-100: #FFE8E7;
+  --color-brand-200: #FFD5D3;
+  --color-brand-300: #FFB3B0;
+  --color-brand-400: #FF908B;
+  --color-brand-500: #FF7C77;
+  --color-brand-600: #EC5B54;
+  --color-brand-700: #C83E38;
+  --color-brand-800: #A3322D;
+  --color-brand-900: #862F2B;
+  --color-brand-950: #491411;
+}
+
+/* Shiki: always dark theme, with Geist Mono */
+.prose .shiki,
+.prose .shiki code {
+  font-family: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+}
+
+.prose .shiki {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
 }

@@ -18,12 +18,22 @@ useSeoMeta({
       <template #left>
         <NuxtLink
           to="/"
-          class="font-semibold"
+          class="flex items-center gap-2 font-semibold"
         >
-          Smidae
+          <img
+            src="/logo.svg"
+            alt="Smidae"
+            class="h-8 w-8"
+          >
+          <span>Smidae</span>
         </NuxtLink>
       </template>
       <template #right>
+        <UButton
+          to="/projects"
+          variant="ghost"
+          label="Projects"
+        />
         <UButton
           to="/tutorials"
           variant="ghost"

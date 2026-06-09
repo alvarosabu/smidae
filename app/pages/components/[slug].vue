@@ -11,9 +11,10 @@ const { data: component } = await useAsyncData<Component | null>(`component-${sl
     filter: { slug: { _eq: slug }, status: { _eq: 'published' } } as never,
     limit: 1,
     fields: [
-      'id', 'slug', 'name', 'manufacturer', 'part_number', 'quantity', 'location',
+      'id', 'slug', 'name', 'availability', 'manufacturer', 'part_number', 'quantity', 'price', 'location',
       'overview', 'features', 'specs', 'date_created', 'date_updated', 'status',
       { category: ['id', 'name', 'slug'] },
+      { thumbnail: ['id', 'filename_download', 'type'] },
       { gallery: [{ directus_files_id: ['id', 'filename_download', 'type'] }] },
       { datasheets: [{ directus_files_id: ['id', 'filename_download', 'type'] }] },
       { tags: [{ tags_id: ['id', 'name'] }] }
@@ -24,6 +25,22 @@ const { data: component } = await useAsyncData<Component | null>(`component-${sl
 
 if (!component.value) throw createError({ statusCode: 404, statusMessage: 'Component not found' })
 
+const { data: overviewHtml } = await useAsyncData(`component-overview-${slug}`, () =>
+  $fetch('/api/markdown', { method: 'POST', body: { source: component.value?.overview } }).then(r => r.html))
+
+// Gallery view: thumbnail first, then the rest of the gallery (de-duped).
+const galleryItems = computed(() => {
+  const gallery = component.value?.gallery ?? []
+  const thumb = component.value?.thumbnail
+  if (!thumb) return gallery
+  const thumbId = typeof thumb === 'string' ? thumb : thumb.id
+  const rest = gallery.filter((g) => {
+    const id = typeof g.directus_files_id === 'string' ? g.directus_files_id : g.directus_files_id?.id
+    return id !== thumbId
+  })
+  return [{ directus_files_id: thumb }, ...rest]
+})
+
 const tagNames = computed(() => (component.value?.tags ?? [])
   .map(t => typeof t.tags_id === 'string' ? null : t.tags_id?.name)
   .filter((n): n is string => !!n))
@@ -32,6 +49,10 @@ const categoryName = computed(() => {
   const c = component.value?.category
   return c && typeof c !== 'string' ? c.name : null
 })
+
+const price = computed(() => formatPrice(component.value?.price))
+
+const availability = computed(() => getAvailability(component.value?.availability))
 
 useSeoMeta({
   title: () => `${component.value?.name} — Smidae`,
@@ -58,7 +79,7 @@ useSeoMeta({
     </nav>
 
     <div class="grid lg:grid-cols-2 gap-8">
-      <CatalogGallery :items="component.gallery ?? []" />
+      <CatalogGallery :items="galleryItems" />
       <div class="space-y-4">
         <div>
           <h1 class="text-3xl font-bold">
@@ -69,13 +90,28 @@ useSeoMeta({
             <span v-if="component.part_number"> · {{ component.part_number }}</span>
           </p>
         </div>
-        <div class="flex gap-2 flex-wrap">
+        <p
+          v-if="price"
+          class="text-2xl font-semibold text-primary"
+        >
+          {{ price }}
+        </p>
+        <div class="flex gap-2 flex-wrap items-center">
+          <span class="inline-flex items-center gap-1.5 text-muted">
+            <UIcon
+              name="i-lucide-package"
+              class="size-4"
+            />
+            {{ component.quantity }} in stock
+          </span>
           <UBadge
-            color="primary"
-            variant="soft"
+            :color="availability.color"
+            variant="subtle"
           >
-            Qty {{ component.quantity }}
+            {{ availability.label }}
           </UBadge>
+        </div>
+        <div class="flex gap-2 flex-wrap">
           <UBadge
             v-if="component.location"
             color="neutral"
@@ -100,7 +136,7 @@ useSeoMeta({
       <h2 class="text-xl font-semibold mb-3">
         Overview
       </h2>
-      <MarkdownBlock :source="component.overview" />
+      <MarkdownBlock :html="overviewHtml" />
     </section>
 
     <section v-if="component.features?.length">

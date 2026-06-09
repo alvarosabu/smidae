@@ -22,7 +22,8 @@ import {
   readPolicies,
   readRelations,
   rest,
-  staticToken
+  staticToken,
+  updateField
 } from '@directus/sdk'
 
 // ---------------------------------------------------------------------------
@@ -283,6 +284,18 @@ async function ensureM2M(opts: {
   junction: string // 'components_tags'
   junctionThisColumn?: string // defaults to `${collection}_id`
   junctionRelatedColumn?: string // defaults to `${relatedCollection}_id`
+  /**
+   * Display template for the parent alias field. An M2M template is evaluated
+   * against the JUNCTION row, so it must traverse the related FK column to
+   * reach a field on the related collection, e.g. `{{ tags_id.name }}`.
+   * Defaults to `{{ <relatedColumn>.name }}`.
+   */
+  template?: string
+  /**
+   * Extra columns on the junction beyond the two FKs — e.g. a BOM `quantity`.
+   * Created after the FK columns so they show up in the junction edit drawer.
+   */
+  extraFields?: FieldDef[]
 }): Promise<void> {
   const {
     collection,
@@ -292,6 +305,7 @@ async function ensureM2M(opts: {
   } = opts
   const thisCol = opts.junctionThisColumn ?? `${collection}_id`
   const relCol = opts.junctionRelatedColumn ?? `${relatedCollection}_id`
+  const template = opts.template ?? `{{ ${relCol}.name }}`
 
   log.step(`M2M ${collection}.${field} ⇄ ${relatedCollection} via ${junction}`)
 
@@ -313,6 +327,11 @@ async function ensureM2M(opts: {
     special: ['m2o'],
     foreign: { table: relatedCollection, column: 'id' }
   })
+
+  // 2b. Extra junction columns (e.g. BOM quantity).
+  for (const extra of opts.extraFields ?? []) {
+    await ensureField(junction, extra)
+  }
 
   // 3. Relations: each FK column on the junction → its target.
   await ensureRelation({
@@ -344,8 +363,18 @@ async function ensureM2M(opts: {
     type: 'alias',
     special: ['m2m'],
     interface: 'list-m2m',
-    options: { template: '{{name}}' }
+    options: { template }
   })
+
+  // 5. Reconcile the display template even when the alias already existed
+  //    (ensureField skips existing fields). This repairs instances that were
+  //    bootstrapped before the template was fixed.
+  await client.request(
+    updateField(collection, field, {
+      meta: { options: { template } } as never
+    })
+  )
+  log.ok(`template ${collection}.${field} → ${template}`)
 }
 
 // ---------------------------------------------------------------------------
@@ -375,6 +404,34 @@ async function ensureStatusField(collection: string): Promise<void> {
         { text: 'Archived', value: 'archived', foreground: '#FFFFFF', background: '#A2B5CD' }
       ]
     },
+    nullable: false
+  })
+}
+
+async function ensureAvailabilityField(collection: string): Promise<void> {
+  await ensureField(collection, {
+    field: 'availability',
+    type: 'string',
+    required: true,
+    defaultValue: 'available',
+    interface: 'select-dropdown',
+    options: {
+      choices: [
+        { text: 'Available', value: 'available' },
+        { text: 'End-of-Life', value: 'eol' },
+        { text: 'Discontinued', value: 'discontinued' }
+      ]
+    },
+    display: 'labels',
+    displayOptions: {
+      showAsDot: true,
+      choices: [
+        { text: 'Available', value: 'available', foreground: '#FFFFFF', background: '#2ECDA7' },
+        { text: 'End-of-Life', value: 'eol', foreground: '#FFFFFF', background: '#FBC54F' },
+        { text: 'Discontinued', value: 'discontinued', foreground: '#FFFFFF', background: '#E35169' }
+      ]
+    },
+    note: 'Manufacturer lifecycle — distinct from the publication status above.',
     nullable: false
   })
 }
@@ -429,6 +486,7 @@ async function bootstrapComponents(): Promise<void> {
   })
 
   await ensureStatusField('components')
+  await ensureAvailabilityField('components')
   await ensureTimestamps('components')
 
   await ensureField('components', { field: 'name', type: 'string', required: true, interface: 'input' })
@@ -457,11 +515,21 @@ async function bootstrapComponents(): Promise<void> {
     field: 'quantity',
     type: 'integer',
     required: true,
-    defaultValue: 0,
+    defaultValue: 1,
     interface: 'input',
     nullable: false
   })
   await ensureField('components', { field: 'location', type: 'string', nullable: true, interface: 'input' })
+  await ensureField('components', {
+    field: 'price',
+    type: 'decimal',
+    nullable: true,
+    interface: 'input',
+    options: { iconLeft: 'euro', step: 0.01 },
+    display: 'formatted-value',
+    displayOptions: { suffix: ' €' },
+    note: 'Unit price in EUR'
+  })
   await ensureField('components', {
     field: 'overview',
     type: 'text',
@@ -496,12 +564,32 @@ async function bootstrapComponents(): Promise<void> {
     }
   })
 
+  // M2O → directus_files (thumbnail / card image).
+  // Single-file field so the Cards layout "Image Source" can use it;
+  // an M2M gallery cannot serve as a single card image.
+  await ensureField('components', {
+    field: 'thumbnail',
+    type: 'uuid',
+    nullable: true,
+    interface: 'file-image',
+    foreign: { table: 'directus_files', column: 'id' },
+    special: ['file']
+  })
+  await ensureRelation({
+    collection: 'components',
+    field: 'thumbnail',
+    related_collection: 'directus_files',
+    schema: { on_delete: 'SET NULL' }
+  })
+
   // M2M gallery → directus_files (distinct junction).
+  // directus_files has no `name` field — display its `title`.
   await ensureM2M({
     collection: 'components',
     field: 'gallery',
     relatedCollection: 'directus_files',
-    junction: 'components_files'
+    junction: 'components_files',
+    template: '{{ directus_files_id.title }}'
   })
 
   // M2M datasheets → directus_files (distinct junction).
@@ -509,7 +597,8 @@ async function bootstrapComponents(): Promise<void> {
     collection: 'components',
     field: 'datasheets',
     relatedCollection: 'directus_files',
-    junction: 'components_datasheets'
+    junction: 'components_datasheets',
+    template: '{{ directus_files_id.title }}'
   })
 
   // M2M tags → tags.
@@ -517,7 +606,8 @@ async function bootstrapComponents(): Promise<void> {
     collection: 'components',
     field: 'tags',
     relatedCollection: 'tags',
-    junction: 'components_tags'
+    junction: 'components_tags',
+    template: '{{ tags_id.name }}'
   })
 }
 
@@ -572,7 +662,77 @@ async function bootstrapTutorials(): Promise<void> {
     collection: 'tutorials',
     field: 'components',
     relatedCollection: 'components',
-    junction: 'tutorials_components'
+    junction: 'tutorials_components',
+    template: '{{ components_id.name }}'
+  })
+}
+
+async function bootstrapProjects(): Promise<void> {
+  log.step('projects')
+  await ensureCollection('projects', {
+    icon: 'dashboard',
+    archiveField: 'status',
+    archiveValue: 'archived',
+    unarchiveValue: 'draft'
+  })
+
+  await ensureStatusField('projects')
+  await ensureTimestamps('projects')
+
+  await ensureField('projects', { field: 'title', type: 'string', required: true, interface: 'input' })
+  await ensureField('projects', { field: 'slug', type: 'string', required: true, unique: true, interface: 'input' })
+  await ensureField('projects', { field: 'summary', type: 'text', nullable: true, interface: 'input-multiline' })
+  await ensureField('projects', {
+    field: 'content',
+    type: 'text',
+    nullable: true,
+    interface: 'input-rich-text-md'
+  })
+
+  // M2O → directus_files (thumbnail / hero image)
+  await ensureField('projects', {
+    field: 'thumbnail',
+    type: 'uuid',
+    nullable: true,
+    interface: 'file-image',
+    foreign: { table: 'directus_files', column: 'id' },
+    special: ['file']
+  })
+  await ensureRelation({
+    collection: 'projects',
+    field: 'thumbnail',
+    related_collection: 'directus_files',
+    schema: { on_delete: 'SET NULL' }
+  })
+
+  // M2M gallery → directus_files
+  await ensureM2M({
+    collection: 'projects',
+    field: 'gallery',
+    relatedCollection: 'directus_files',
+    junction: 'projects_files',
+    template: '{{ directus_files_id.title }}'
+  })
+
+  // BOM: M2M projects.components → components, with a per-row quantity.
+  await ensureM2M({
+    collection: 'projects',
+    field: 'components',
+    relatedCollection: 'components',
+    junction: 'projects_components',
+    template: '{{ components_id.name }} × {{ quantity }}',
+    extraFields: [
+      {
+        field: 'quantity',
+        type: 'integer',
+        required: true,
+        defaultValue: 1,
+        nullable: false,
+        interface: 'input',
+        options: { min: 1 },
+        note: 'Units required for this build'
+      }
+    ]
   })
 }
 
@@ -640,18 +800,26 @@ async function ensurePermissions(policyId: string, specs: PermSpec[]): Promise<v
 
 async function bootstrapPermissions(): Promise<void> {
   const publicPolicy = await getPublicPolicyId()
-  const publishedOnly = { status: { _eq: 'published' } }
 
+  // NOTE: components/tutorials are granted *unfiltered* public read. The ideal
+  // is a `{ status: { _eq: 'published' } }` row filter, but custom permission
+  // rules are a licensed entitlement (`custom_permission_rules_enabled`) and
+  // creating one fails with RESOURCE_RESTRICTED on unlicensed instances. The
+  // browser only ever queries with `status=published`, so the UI is unaffected;
+  // the trade-off is that drafts are readable via the raw Directus API.
   await ensurePermissions(publicPolicy, [
     { collection: 'categories', action: 'read' },
     { collection: 'tags', action: 'read' },
-    { collection: 'components', action: 'read', permissions: publishedOnly },
-    { collection: 'tutorials', action: 'read', permissions: publishedOnly },
+    { collection: 'components', action: 'read' },
+    { collection: 'tutorials', action: 'read' },
     { collection: 'directus_files', action: 'read' },
     { collection: 'components_files', action: 'read' },
     { collection: 'components_datasheets', action: 'read' },
     { collection: 'components_tags', action: 'read' },
-    { collection: 'tutorials_components', action: 'read' }
+    { collection: 'tutorials_components', action: 'read' },
+    { collection: 'projects', action: 'read' },
+    { collection: 'projects_files', action: 'read' },
+    { collection: 'projects_components', action: 'read' }
   ])
 }
 
@@ -666,6 +834,7 @@ async function main(): Promise<void> {
   await bootstrapTags()
   await bootstrapComponents()
   await bootstrapTutorials()
+  await bootstrapProjects()
   await bootstrapPermissions()
 
   console.log('\nschema bootstrap complete')
