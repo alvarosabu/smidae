@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 197 197" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="file">
+        <use id="Rounded-Rectangle-2-copy" serif:id="Rounded Rectangle 2 copy" xlink:href="#_Image1" x="54" y="34" width="96px" height="128px"/>
+        <path id="Shape-15" serif:id="Shape 15" d="M42,42L42,72L27,58L42,42Z" style="fill:rgb(148,148,148);"/>
+        <path id="Shape-15-copy-2" serif:id="Shape 15 copy 2" d="M42,73L42,103L27,89L42,73Z" style="fill:rgb(148,148,148);"/>
+        <path id="Shape-15-copy-3" serif:id="Shape 15 copy 3" d="M42,106L42,136L27,122L42,106Z" style="fill:rgb(148,148,148);"/>
+        <path id="Shape-15-copy-4" serif:id="Shape 15 copy 4" d="M42,139L42,169L27,155L42,139Z" style="fill:rgb(148,148,148);"/>
+        <path id="Shape-15-copy" serif:id="Shape 15 copy" d="M159,42L159,72L174,58L159,42Z" style="fill:rgb(148,148,148);"/>
+        <path id="Shape-15-copy-5" serif:id="Shape 15 copy 5" d="M159,73L159,103L174,89L159,73Z" style="fill:rgb(148,148,148);"/>
+        <path id="Shape-15-copy-6" serif:id="Shape 15 copy 6" d="M159,106L159,136L174,122L159,106Z" style="fill:rgb(148,148,148);"/>
+        <path id="Shape-15-copy-7" serif:id="Shape 15 copy 7" d="M159,139L159,169L174,155L159,139Z" style="fill:rgb(148,148,148);"/>
+        <rect id="Rectangle-7" serif:id="Rectangle 7" x="27" y="39" width="147" height="20" style="fill:rgb(223,223,223);"/>
+        <rect id="Rectangle-7-copy" serif:id="Rectangle 7 copy" x="27" y="70" width="147" height="20" style="fill:rgb(223,223,223);"/>
+        <rect id="Rectangle-7-copy-2" serif:id="Rectangle 7 copy 2" x="27" y="103" width="147" height="20" style="fill:rgb(223,223,223);"/>
+        <rect id="Rectangle-7-copy-3" serif:id="Rectangle 7 copy 3" x="27" y="134" width="147" height="20" style="fill:rgb(223,223,223);"/>
+        <path id="Shape-3-copy-4" serif:id="Shape 3 copy 4" d="M150,154L125,154L150,129L150,154Z" style="fill-opacity:0.35;"/>
+        <use id="Rounded-Rectangle-2" serif:id="Rounded Rectangle 2" xlink:href="#_Image2" x="54" y="30" width="96px" height="128px"/>
+        <path id="Shape-3" serif:id="Shape 3" d="M125,133L150,133L125,158L125,133Z" style="fill:rgb(223,223,223);"/>
+        <path id="Shape-3-copy" serif:id="Shape 3 copy" d="M125,158L100,158L125,133L125,158Z" style="fill-opacity:0.35;"/>
+        <defs>
+            <mask id="Mask">
+            
+                <g transform="matrix(1,-0,-0,1,0,0)"><image id="_Image3" width="197px" height="197px" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMUAAADFCAAAAADBU2ksAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABA0lEQVR4nO3YQQrAIAwAwVr6/y+3bygEHGTnLOKSS3C91wHu3Q8YUYWjCkcVjiocVTie0dvWz/NTS9wZs6jCUYWjCkcVjiocVTiqcFThWP2ZM6pwVOGowlGFowpHFY4qHFU4qnBU4ajCUYWjCkcVjiocVTiqcFThqMJRhaMKRxWOKhxVOKpwVOGowlGFowpHFY4qHFU4qnBU4ajCUYWjCkcVjiocVTiqcFThqMJRhaMKRxWOKhxVOKpwVOGowlGFowpHFY4qHFU4qnBU4ajCUYWjCkcVjiocVTiqcFThqMJRhaMKRxWOKhxVOKpwVOGowlGFowpHFY4qHFU4qnBU4Tij4gOaEwSJ5UxhGAAAAABJRU5ErkJggg=="/>
+                </g>
+            </mask>
+        </defs>
+        <g opacity="0.35" mask="url(#Mask)">
+            <path id="Ellipse-13" serif:id="Ellipse 13" d="M102,13C111.389,13 119,20.611 119,30C119,39.389 111.389,47 102,47C92.611,47 85,39.389 85,30C85,20.611 92.611,13 102,13Z"/>
+        </g>
+        <path id="Ellipse-13-copy" serif:id="Ellipse 13 copy" d="M72,49.5C74.209,49.5 76,51.291 76,53.5C76,55.709 74.209,57.5 72,57.5C69.791,57.5 68,55.709 68,53.5C68,51.291 69.791,49.5 72,49.5Z" style="fill-opacity:0.35;"/>
+    </g>
+    <defs>
+        <image id="_Image1" width="96px" height="128px" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAACACAYAAAD03Gy6AAAACXBIWXMAAA7EAAAOxAGVKw4bAAACL0lEQVR4nO3Wv01bUQBG8eNXeYSQOVggkdIyQdIAJUPADi5NlwmoI7IAc0SMQIVSGCJF+Qf4Ph8Fn1/l6r6n71jXXvDg7ux0Ak6AI+AQeENGugVugCvgcrla3wMsAO7OTt8Cn4F32uvtl2vg03K1/rZ4+OZ/ofF37Rr48HjtNP7uvQeOJzZ3fhxHE5sf3DgOJ/q3YzqY7DfYdwWQFUBWAFkBZAWQFUBWAFkBZAWQFUBWAFkBZAWQFUBWAFkBZAWQFUBWAFkBZAWQFUBWAFkBZAWQFUBWAFkBZAWQFUBWAFkBZAWQFUBWAFkBZAWQFUBWAFkBZAWQFUBWAFkBZAWQFUBWAFkBZAWQFUBWAFkBZAWQFUBWAFkBZAWQFUBWAFkBZAWQFUBWAFkBZAWQFUBWAFkBZAWQFUBWAFkBZAWQFUBWAFkBZAWQFUBWAFkBZAWQFUBWAFkBZAWQFUBWAFkBZAWQFUBWAFkBZAWQFUBWAFkBXBcF8FwsV+vzAjgulqv1OXQFGX6MDwXYtZ/GhwLs0i/jQwF25bfjQwF24Y/jQwHm9tfxoQBz+uf4UIC5PGl8KMAcnjw+FGC0Z40PBRjp2eNDAUZ50fhQgBFePD4UYFtbjQ8F2MbW40MBXmrI+LAJcDvioD0ybHzYBLgZddgeGDo+bAJcjTzwFRs+PmwCXAJfRx/8yswyPsC0XK3vgY/A9RwPeAVmGx9g8fjh7ux0Ao6BI+AQOJjrof+RWccH+A6MIlT2QlIwKQAAAABJRU5ErkJggg=="/>
+        <image id="_Image2" width="96px" height="128px" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAACACAYAAAD03Gy6AAAACXBIWXMAAA7EAAAOxAGVKw4bAAACMElEQVR4nO3Wv01bUQBG8ePXeIWQOVggkdIyQdLADnRIIHfegS4TUEdkAeaIWIEGpTBEivIP8H0+Cj6/ytV9T9+xrr3gwd3Z6QScAEfAIfCGjHQL3ABXwOVytb4HWADcnZ2+BT4D77TX2y/XwKflav1t8fDN/0Lj79o18OHx2mn83XsPHE9s7vw4jiY2P7hxHE70b8d0MNlvsO8KICuArACyAsgKICuArACyAsgKICuArACyAsgKICuArACyAsgKICuArACyAsgKICuArACyAsgKICuArACyAsgKICuArACyAsgKICuArACyAsgKICuArACyAsgKICuArACyAsgKICuArACyAsgKICuArACyAsgKICuArACyAsgKICuArACyAsgKICuArACyAsgKICuArACyAsgKICuArACyAsgKICuArACyAsgKICuArACyAsgKICuArACyAsgKICuArACyAsgKICuArACyAsgKICuArACyArguCuC5WK7W5wVwXCxX63PoCjL8GB8KsGs/jQ8F2KVfxocC7Mpvx4cC7MIfx4cCzO2v40MB5vTP8aEAc3nS+FCAOTx5fCjAaM8aHwow0rPHhwKM8qLxoQAjvHh8KMC2thofCrCNrceHArzUkPFhE+B2xEF7ZNj4sAlwM+qwPTB0fNgEuBp54Cs2fHzYBLgEvo4++JWZZXyAabla3wMfges5HvAKzDY+wOLxw93Z6QQcA0fAIXAw10P/I7OOD/AdXmVRup0eug4AAAAASUVORK5CYII="/>
+    </defs>
+</svg>
